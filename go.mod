@@ -1,4 +1,4 @@
-module github.com/alanshaw/ipfs-ds-postgres
+module github.com/ipfs/ipfs-ds-postgres
 
 go 1.14
 
