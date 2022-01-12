@@ -16,7 +16,6 @@ type batch struct {
 // Batch creates a set of deferred updates to the database.
 func (d *Datastore) Batch() (ds.Batch, error) {
 	b := &pgx.Batch{}
-	b.Queue("BEGIN")
 	return &batch{ds: d, batch: b}, nil
 }
 
@@ -32,7 +31,6 @@ func (b *batch) Delete(key ds.Key) error {
 }
 
 func (b *batch) Commit() error {
-	b.batch.Queue("COMMIT")
 	return b.CommitContext(context.Background())
 }
 
