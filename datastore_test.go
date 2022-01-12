@@ -27,7 +27,7 @@ func initPG(t *testing.T) {
 		connConf, err := pgx.ParseConfig(fmt.Sprintf(
 			"postgres://%s:%s@%s/%s?sslmode=disable",
 			envString(t, "PG_USER", "postgres"),
-			envString(t, "PG_PASS", ""),
+			envString(t, "PG_PASS", "postgres"),
 			envString(t, "PG_HOST", "127.0.0.1"),
 			envString(t, "PG_DB", envString(t, "PG_USER", "postgres")),
 		))
@@ -62,7 +62,7 @@ func newDS(t *testing.T) (*Datastore, func()) {
 	connString := fmt.Sprintf(
 		"postgres://%s:%s@%s/%s?sslmode=disable",
 		envString(t, "PG_USER", "postgres"),
-		envString(t, "PG_PASS", ""),
+		envString(t, "PG_PASS", "postgres"),
 		envString(t, "PG_HOST", "127.0.0.1"),
 		"test_datastore",
 	)
@@ -78,7 +78,14 @@ func newDS(t *testing.T) (*Datastore, func()) {
 	if err != nil {
 		t.Fatal(err)
 	}
+	_, err = conn.Exec(context.Background(), "CREATE INDEX IF NOT EXISTS blocks_key_text_pattern_ops_idx ON blocks (key text_pattern_ops)")
+	if err != nil {
+		t.Fatal(err)
+	}
 	d, err := NewDatastore(context.Background(), connString)
+	if err != nil {
+		t.Fatal(err)
+	}
 	return d, func() {
 		_, _ = conn.Exec(context.Background(), "DROP TABLE IF EXISTS blocks")
 		_ = conn.Close(context.Background())
