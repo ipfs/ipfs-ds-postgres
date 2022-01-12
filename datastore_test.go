@@ -78,6 +78,10 @@ func newDS(t *testing.T) (*Datastore, func()) {
 	if err != nil {
 		t.Fatal(err)
 	}
+	_, err = conn.Exec(context.Background(), "CREATE INDEX IF NOT EXISTS blocks_key_text_pattern_ops_idx ON blocks (key text_pattern_ops)")
+	if err != nil {
+		t.Fatal(err)
+	}
 	d, err := NewDatastore(context.Background(), connString)
 	return d, func() {
 		_, _ = conn.Exec(context.Background(), "DROP TABLE IF EXISTS blocks")
