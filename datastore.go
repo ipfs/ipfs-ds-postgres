@@ -43,12 +43,7 @@ func (d *Datastore) Close() error {
 }
 
 // Delete removes a row from the PostgreSQL database by the given key.
-func (d *Datastore) Delete(key ds.Key) error {
-	return d.DeleteContext(context.Background(), key)
-}
-
-// DeleteContext removes a row from the PostgreSQL database by the given key.
-func (d *Datastore) DeleteContext(ctx context.Context, key ds.Key) error {
+func (d *Datastore) Delete(ctx context.Context, key ds.Key) error {
 	sql := fmt.Sprintf("DELETE FROM %s WHERE key = $1", d.table)
 	_, err := d.pool.Exec(ctx, sql, key.String())
 	if err != nil {
@@ -58,12 +53,7 @@ func (d *Datastore) DeleteContext(ctx context.Context, key ds.Key) error {
 }
 
 // Get retrieves a value from the PostgreSQL database by the given key.
-func (d *Datastore) Get(key ds.Key) (value []byte, err error) {
-	return d.GetContext(context.Background(), key)
-}
-
-// GetContext retrieves a value from the PostgreSQL database by the given key.
-func (d *Datastore) GetContext(ctx context.Context, key ds.Key) (value []byte, err error) {
+func (d *Datastore) Get(ctx context.Context, key ds.Key) (value []byte, err error) {
 	sql := fmt.Sprintf("SELECT data FROM %s WHERE key = $1", d.table)
 	row := d.pool.QueryRow(ctx, sql, key.String())
 	var out []byte
@@ -78,12 +68,7 @@ func (d *Datastore) GetContext(ctx context.Context, key ds.Key) (value []byte, e
 }
 
 // Has determines if a value for the given key exists in the PostgreSQL database.
-func (d *Datastore) Has(key ds.Key) (bool, error) {
-	return d.HasContext(context.Background(), key)
-}
-
-// HasContext determines if a value for the given key exists in the PostgreSQL database.
-func (d *Datastore) HasContext(ctx context.Context, key ds.Key) (bool, error) {
+func (d *Datastore) Has(ctx context.Context, key ds.Key) (bool, error) {
 	sql := fmt.Sprintf("SELECT exists(SELECT 1 FROM %s WHERE key = $1)", d.table)
 	row := d.pool.QueryRow(ctx, sql, key.String())
 	var exists bool
@@ -98,12 +83,7 @@ func (d *Datastore) HasContext(ctx context.Context, key ds.Key) (bool, error) {
 }
 
 // Put "upserts" a row into the SQL database.
-func (d *Datastore) Put(key ds.Key, value []byte) error {
-	return d.PutContext(context.Background(), key, value)
-}
-
-// PutContext "upserts" a row into the PostgreSQL database.
-func (d *Datastore) PutContext(ctx context.Context, key ds.Key, value []byte) error {
+func (d *Datastore) Put(ctx context.Context, key ds.Key, value []byte) error {
 	sql := fmt.Sprintf("INSERT INTO %s (key, data) VALUES ($1, $2) ON CONFLICT (key) DO UPDATE SET data = $2", d.table)
 	_, err := d.pool.Exec(ctx, sql, key.String(), value)
 	if err != nil {
@@ -113,12 +93,7 @@ func (d *Datastore) PutContext(ctx context.Context, key ds.Key, value []byte) er
 }
 
 // Query returns multiple rows from the SQL database based on the passed query parameters.
-func (d *Datastore) Query(q dsq.Query) (dsq.Results, error) {
-	return d.QueryContext(context.Background(), q)
-}
-
-// QueryContext returns multiple rows from the SQL database based on the passed query parameters.
-func (d *Datastore) QueryContext(ctx context.Context, q dsq.Query) (dsq.Results, error) {
+func (d *Datastore) Query(ctx context.Context, q dsq.Query) (dsq.Results, error) {
 	var sql string
 	if q.KeysOnly && q.ReturnsSizes {
 		sql = fmt.Sprintf("SELECT key, octet_length(data) FROM %s", d.table)
@@ -216,18 +191,12 @@ func (d *Datastore) QueryContext(ctx context.Context, q dsq.Query) (dsq.Results,
 }
 
 // Sync is noop for PostgreSQL databases.
-func (d *Datastore) Sync(key ds.Key) error {
+func (d *Datastore) Sync(ctx context.Context, key ds.Key) error {
 	return nil
 }
 
 // GetSize determines the size in bytes of the value for a given key.
-func (d *Datastore) GetSize(key ds.Key) (int, error) {
-	return d.GetSizeContext(context.Background(), key)
-}
-
-// GetSizeContext determines the size in bytes of the value for a given key.
-// Returns -1 if not found or other error occurs.
-func (d *Datastore) GetSizeContext(ctx context.Context, key ds.Key) (int, error) {
+func (d *Datastore) GetSize(ctx context.Context, key ds.Key) (int, error) {
 	sql := fmt.Sprintf("SELECT octet_length(data) FROM %s WHERE key = $1", d.table)
 	row := d.pool.QueryRow(ctx, sql, key.String())
 	var size int
