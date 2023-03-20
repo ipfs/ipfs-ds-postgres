@@ -55,8 +55,8 @@ func initPG(t *testing.T) {
 
 // returns datastore, and a function to call on exit.
 //
-//  d, close := newDS(t)
-//  defer close()
+//	d, close := newDS(t)
+//	defer close()
 func newDS(t *testing.T) (*Datastore, func()) {
 	initPG(t)
 	connString := fmt.Sprintf(
