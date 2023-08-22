@@ -55,8 +55,8 @@ func initPG(t *testing.T) {
 
 // returns datastore, and a function to call on exit.
 //
-//  d, close := newDS(t)
-//  defer close()
+//	d, close := newDS(t)
+//	defer close()
 func newDS(t *testing.T) (*Datastore, func()) {
 	initPG(t)
 	connString := fmt.Sprintf(
@@ -79,6 +79,9 @@ func newDS(t *testing.T) (*Datastore, func()) {
 		t.Fatal(err)
 	}
 	d, err := NewDatastore(context.Background(), connString)
+	if err != nil {
+		t.Fatal(err)
+	}
 	return d, func() {
 		_, _ = conn.Exec(context.Background(), "DROP TABLE IF EXISTS blocks")
 		_ = conn.Close(context.Background())
