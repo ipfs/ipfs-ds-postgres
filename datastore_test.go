@@ -25,11 +25,10 @@ func envString(t *testing.T, key string, defaultValue string) string {
 func initPG(t *testing.T) {
 	initOnce.Do(func() {
 		connConf, err := pgx.ParseConfig(fmt.Sprintf(
-			"postgres://%s:%s@%s/%s?sslmode=disable",
+			"postgres://%s:%s@%s/?sslmode=disable",
 			envString(t, "PG_USER", "postgres"),
 			envString(t, "PG_PASS", ""),
 			envString(t, "PG_HOST", "127.0.0.1"),
-			envString(t, "PG_DB", envString(t, "PG_USER", "postgres")),
 		))
 		if err != nil {
 			t.Fatal(err)
