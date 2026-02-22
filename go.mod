@@ -1,6 +1,6 @@
 module github.com/ipfs/ipfs-ds-postgres
 
-go 1.24
+go 1.25
 
 require (
 	github.com/ipfs/go-datastore v0.5.1
